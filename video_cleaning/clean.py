@@ -39,7 +39,7 @@ def clean(image):
     ones = np.ones(image.shape, dtype=np.uint8)
     divided = image / blank
     # for some reason its make it look better
-    # divided += np.array([0.1, 0, 0])
+    divided += np.array([0.1, 0, 0])
     image = np.minimum(divided, ones)
     image = 0.5 - 0.5 * np.cos(pow(image, 2.5) * np.pi)
     # transform the image back to 0 to 255
