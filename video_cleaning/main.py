@@ -51,11 +51,12 @@ while True:
             points = []
         # if the 'b' key is pressed, break from the loop
         elif key == ord("b"):
+            print('please press b to take a clean boardshot \nor u to save regular boardshot')
             is_edges = True
     else:
         # get only the whiteboard
         warped = four_point_transform(image, np.array(points, dtype="float32"))
-        # TODO this resize is for faster computing, we need to show the original image as in the end
+        original = warped.copy()
         warped = imutils.resize(warped, width=500)
         board = warped.copy()
         (H, W) = warped.shape[:2]
@@ -63,6 +64,7 @@ while True:
         parts = []
         # return an even distance number by the number of parts from zero to the image width
         dist = np.linspace(0, W, num_of_parts, endpoint=False)
+        original_dist, original_step = np.linspace(0, original.shape[1], num_of_parts, endpoint=False, retstep=True)
         # background subtraction
         fgmask = fgbg.apply(warped)
 
@@ -77,15 +79,15 @@ while True:
         if len(final) == 0:
             for i in range(num_of_parts):
                 if i == num_of_parts - 1:
-                    final.append(board[:, int(dist[i]):])
+                    final.append(original[:, int(original_dist[i]):])
                 else:
-                    final.append(board[:, int(dist[i]):int(dist[i + 1]) - 1])
+                    final.append(original[:, int(original_dist[i]):int(original_dist[i + 1]) - 1])
         # if the average of the part is zero its mean that there was no movement
         # a while so we can update the board,
         for p in range(len(parts)):
             r = round(np.average(parts[p]), 2)
             if r == 0.0:
-                final[p] = board[:, 50 * p:50 * (p + 1)]
+                final[p] = original[:, int(original_step) * p: int(original_step) * (p + 1)]
 
         # build and display the whiteboard
         final_image = np.concatenate(tuple(final), axis=1)
@@ -106,13 +108,13 @@ while True:
                 print('Image saved to', path + r'\{}.jpg'.format(img_num))
                 img_num += 1
                 cleaned = 0
-            elif key == ord("u"):  # save without cleaning
-                if not os.path.exists(path):
-                    os.makedirs(path)
-                cv2.imwrite(path + r'\{}.jpg'.format(img_num), final_image)
-                print('Image saved to', path + r'\{}.jpg'.format(img_num))
-                img_num += 1
             else:
                 print('please press b to take a clean boardshot \nor u to save regular boardshot')
+        elif key == ord("u"):  # save without cleaning
+            if not os.path.exists(path):
+                os.makedirs(path)
+            cv2.imwrite(path + r'\{}.jpg'.format(img_num), final_image)
+            print('Image saved to', path + r'\{}.jpg'.format(img_num))
+            img_num += 1
 
 cv2.destroyAllWindows()
