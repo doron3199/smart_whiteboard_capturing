@@ -24,5 +24,5 @@ Then click on the lecturer. The screen will reload. After pressing `b`, you will
 the "cleaned" image. Press `s` to save, and `u` to save the original image.
 
 # Resources
-(Microsoft)[https://www.microsoft.com/en-us/research/uploads/prod/2016/12/Whiteboard-It.pdf]
-(PyImageSearch)[https://www.pyimagesearch.com/]
+- Microsoft[https://www.microsoft.com/en-us/research/uploads/prod/2016/12/Whiteboard-It.pdf]
+- PyImageSearch[https://www.pyimagesearch.com/]
