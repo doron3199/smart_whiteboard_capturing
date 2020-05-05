@@ -19,9 +19,10 @@ You can also use the abbreviations l, r, u and d.
 2. The directory that the images should be saved to.
 
 ### Start the program
-On the window with the recorded screen, click on the corners of the whiteboard, then press `c`.
-Then click on the lecturer. The screen will reload. After pressing `b`, you will be able to view
+On the window with the recorded screen, click on the corners of the whiteboard, then press `b`, if you want to reset, press 'r'
+The screen will reload. After pressing `b`, you will be able to view
 the "cleaned" image. Press `s` to save, and `u` to save the original image.
+press 'c' to exit.
 
 # Resources
 - [Microsoft](https://www.microsoft.com/en-us/research/uploads/prod/2016/12/Whiteboard-It.pdf)
