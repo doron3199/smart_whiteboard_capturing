@@ -304,7 +304,7 @@ class MidScreen(RelativeLayout):
 class FinalScreen(RelativeLayout):
     def __init__(self, **kwargs):
         super(FinalScreen, self).__init__(**kwargs)
-        headline = Label(text='click on image to delete it', size_hint=(.7, .1),
+        headline = Label(text='click on images you want to save', size_hint=(.7, .1),
                          pos_hint={'center_x': .5, 'center_y': .94})
         self.rv = RV(size_hint=(0.5, 0.7),
                      pos_hint={'center_x': .2, 'center_y': .5})
@@ -327,11 +327,9 @@ class FinalScreen(RelativeLayout):
 
     def save_callback(self, instance):
         global ct
-        for index in sorted(list(delete_set), reverse=True):
-            del ct.clean_images[index]
         if not os.path.exists(self.path.text):
             os.makedirs(self.path.text)
-        for i in range(len(ct.clean_images)):
+        for i in save_set:
             cv2.imwrite(self.path.text + r'\{}.jpg'.format(i), ct.clean_images[i])
             print('Image saved to', self.path.text + r'\{}.jpg'.format(i))
 
@@ -391,9 +389,9 @@ class SelectableImage(RecycleDataViewBehavior, Image):
         global ct
         try:
             if is_selected:
-                delete_set.add(index)
+                save_set.add(index)
             else:
-                delete_set.remove(index)
+                save_set.remove(index)
         except:
             pass
 
@@ -439,7 +437,7 @@ class MyApp(App):
 
 
 if __name__ == '__main__':
-    delete_set = set()
+    save_set = set()
     ct = None
     sm = ScreenManager()
     open_screen = Screen(name='open_screen')

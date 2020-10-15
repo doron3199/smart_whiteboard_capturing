@@ -3,46 +3,54 @@ import numpy as np
 
 
 def to_blank(image):
-    gray = cv.cvtColor(image, cv.COLOR_RGB2GRAY)
-    height, width = gray.shape
-    cells = []
-    size = image.size
-    num = 150
-    if size > 10000000:
-        num = 300
-    # split the wb to cells
-    for i in range(num):
-        cells.append([])
-        for j in range(num):
-            cells[i].append(gray[i * height // num:(i + 1) * height // num, j * width // num:(j + 1) * width // num])
-    # for each cell compute the average of the 25% most brightness pixels
-    for i in range(num):
-        for j in range(num):
-            va = np.sort(np.reshape(cells[i][j], -1))
-            cn = va[-(len(va) // 4):]
-            cells[i][j][:, :] = np.average(cn)
-    # built the image
-    new = []
-    for i in range(num):
-        new.append(np.concatenate((cells[i][:]), axis=1))
-    blank = np.concatenate((new[:]), axis=0)
+    """
+    to blank get an image of a whiteboard and returns blank image of the whiteboard
+    without the marker stokes used to improve the whiteboard image
+    """
+    # blank images for the background image
+    board = np.zeros(image.shape)
+    height, width = image.shape[:2]
+    # divide the images to cells
+    cell_size = 7
+    bv = list(range(0, height, cell_size))
+    bv.append(height)
+    bh = list(range(0, width, cell_size))
+    bh.append(width)
+    for i in range(len(bv) - 1):
+        for j in range(len(bh) - 1):
+            current = image[bv[i]:bv[i + 1], bh[j]:bh[j + 1]]
+            # luminance matrix
+            lum = np.multiply(0.2126, current[:, :, 0]) + \
+                  np.multiply(0.7152, current[:, :, 1]) + \
+                  np.multiply(0.0722, current[:, :, 2])
+
+            # reshape lum for the argsoft, just flatten it to a matrix
+            lum = np.reshape(lum.flatten(), (len(lum.flatten()), 1))
+            # sort the pixels in current by their luminance value in descending order
+            lum1inds = lum.argsort()
+            sorted_by_lum = current[lum1inds[::-1]]
+            # get the top 25%
+            top_lum = sorted_by_lum[:(len(sorted_by_lum) // 4)]
+            # average them
+            average = top_lum.mean(axis=0).mean(axis=0)
+            # put it in the matrix
+            board[bv[i]:bv[i + 1],
+            bh[j]:bh[j + 1]] = np.ones(shape=current.shape, dtype=np.uint8) * np.uint8(average)
+
     # median blur for cells that filled with color
-    median = cv.medianBlur(blank, 21)
-    return median
+    board = cv.medianBlur(board.astype(np.uint8), 21)
+    return board
 
 
 def clean(image):
+    """clean get an image of a whiteboard and returns an improved colored image"""
     #  get an image of the blank wb
     blank = to_blank(image.copy())
-    blank = cv.cvtColor(blank, cv.COLOR_GRAY2RGB)
     # you should read the microsoft research for this lines
-    ones = np.ones(image.shape, dtype=np.uint8)
-    divided = image / blank
-    # for some reason its make it look better
-    divided += np.array([0.1, 0, 0])
-    image = np.minimum(divided, ones)
-    image = 0.5 - 0.5 * np.cos(pow(image, 2.5) * np.pi)
+    image = np.minimum(image / blank, 1)
+    image = np.subtract(0.5, np.multiply(0.5, np.cos(np.power(image, 2.5) * np.pi)))
     # transform the image back to 0 to 255
     image *= 255
     image = image.astype(np.uint8)
+
     return image
