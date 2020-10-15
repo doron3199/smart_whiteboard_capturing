@@ -312,10 +312,10 @@ class FinalScreen(RelativeLayout):
                            pos_hint={'center_x': .8, 'center_y': .2})
         final_btn.bind(on_press=self.final_callback)
         save_btn = Button(text='save images', size_hint=(0.2, 0.1),
-                           pos_hint={'center_x': .8, 'center_y': .3})
+                          pos_hint={'center_x': .8, 'center_y': .3})
         save_btn.bind(on_press=self.save_callback)
         self.path = TextInput(text='path', size_hint=(0.2, 0.1),
-                           pos_hint={'center_x': .8, 'center_y': .5})
+                              pos_hint={'center_x': .8, 'center_y': .5})
         self.add_widget(self.path)
         self.add_widget(save_btn)
         self.add_widget(headline)
@@ -329,9 +329,20 @@ class FinalScreen(RelativeLayout):
         global ct
         if not os.path.exists(self.path.text):
             os.makedirs(self.path.text)
-        for i in save_set:
-            cv2.imwrite(self.path.text + r'\{}.jpg'.format(i), ct.clean_images[i])
-            print('Image saved to', self.path.text + r'\{}.jpg'.format(i))
+        pil_list = []
+        for i in sorted(list(save_set)):
+            temp = cv2.cvtColor(ct.clean_images[i], cv2.COLOR_BGR2RGB)
+            pil_list.append(PIL_Image.fromarray(temp))
+            pil_list[-1] = pil_list[-1].convert('RGB')
+        i = 0
+        while os.path.exists(self.path.text + r'\whiteboard_{}.pdf'.format(i)):
+            i += 1
+        if len(pil_list) == 1:
+            pil_list[0].save(self.path.text + r'\whiteboard_{}.pdf'.format(i))
+        elif len(pil_list) > 1:
+            pil_list[0].save(self.path.text + r'\whiteboard_{}.pdf'.format(i), save_all=True, append_images=pil_list[1:])
+
+        print('pdf saved to', self.path.text + r'\whiteboard_{}.pdf'.format(i))
 
     def start(self):
         self.rv.refresh()

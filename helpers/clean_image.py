@@ -5,7 +5,7 @@ import numpy as np
 def clean(image):
     """clean get an image of a whiteboard and returns an improved colored image"""
     #  get an image of the blank whiteboard
-    blank = cv.medianBlur(image.astype(np.uint8), 11)
+    blank = cv.medianBlur(image, 11)
 
     # you should read the microsoft research for this lines
     image = np.minimum(image / blank, 1)
