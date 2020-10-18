@@ -24,6 +24,7 @@ from PIL import Image as PIL_Image, ImageGrab
 from io import BytesIO
 import cv2
 import numpy as np
+from helpers.filter_images import filter_images
 from helpers.clean_video import CleanThread
 import time
 
@@ -297,6 +298,7 @@ class MidScreen(RelativeLayout):
     def final_callback(self, instance):
         global ct
         ct.loop = False
+        ct.clean_images = filter_images(ct.clean_images)
         fc.start()
         sm.switch_to(final_screen)
 
@@ -307,7 +309,7 @@ class FinalScreen(RelativeLayout):
         headline = Label(text='click on images you want to save', size_hint=(.7, .1),
                          pos_hint={'center_x': .5, 'center_y': .94})
         self.rv = RV(size_hint=(0.5, 0.7),
-                     pos_hint={'center_x': .2, 'center_y': .5})
+                     pos_hint={'center_x': .3, 'center_y': .5})
         final_btn = Button(text='close window', size_hint=(0.2, 0.1),
                            pos_hint={'center_x': .8, 'center_y': .2})
         final_btn.bind(on_press=self.final_callback)

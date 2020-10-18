@@ -31,8 +31,9 @@ class CleanThread(threading.Thread):
 
     def run(self):
         cv2.destroyAllWindows()
+        time.sleep(2)
         fgbg = cv2.createBackgroundSubtractorKNN()
-        fgbg.setHistory(500)
+        fgbg.setHistory(50)
         timer = Timer()
         num_of_parts = 10
         final_points = self.points
@@ -44,6 +45,7 @@ class CleanThread(threading.Thread):
             was_points_changed = False
             # points will be update only in the start of the loop
             if final_points != self.points:
+                time.sleep(2)
                 cv2.destroyAllWindows()
                 final_points = self.points
                 timer.reset()
@@ -87,3 +89,6 @@ class CleanThread(threading.Thread):
             if timer.get_time() > 60:
                 timer.reset()
                 self.clean_images.append(clean(self.final_image))
+
+        self.clean_images.append(clean(self.final_image))
+
